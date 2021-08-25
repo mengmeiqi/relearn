@@ -1,0 +1,17 @@
+浏览器对象模型（BOM）
+
+1.Internet Explorer 3 和 Netscape Navigator 3 有一个共同特色。
+那就是支持可以访问和操作浏览器窗口的浏览器对象模型（BOM，Brower Object Model）。
+
+2.BOM作为JavaScript实现的一部分但却没有相关的标准。这个问题在HTML5中得到了解决。
+HTML5致力于把很多BOM功能写入正式规范。
+
+3.从根本上讲，BOM只处理浏览器窗口和框架；
+但人们习惯上也把所有针对浏览器的JavaScript扩展算作BOM的一部分。
+下面就是一些这样的扩展：
+(1)弹出新浏览器窗口的功能；
+(2)移动、缩放和关闭浏览器窗口的功能；
+(3)提供浏览器详细信息的navagator对象；
+(4)提供浏览器所加载页面的详细信息的location对象；
+(5)对cookies的支持；
+(6)像XMLHttpRequest和IE的ActiviveXObject这样的自定义对象
