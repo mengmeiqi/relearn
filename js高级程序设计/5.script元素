@@ -17,3 +17,5 @@
 表示编写代码使用的脚本语言的内容类型（也称为MINE类型）。
 值：text/javascript；text/ecmacsipt
 
+4.使用<script>元素的方式有两种：
+直接在页面中嵌入JavaScript代码和包含外部JavaScript文件。
