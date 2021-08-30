@@ -19,3 +19,5 @@
 
 4.使用<script>元素的方式有两种：
 直接在页面中嵌入JavaScript代码和包含外部JavaScript文件。
+在使用<script>元素嵌入JavaScript代码时，只须为<script>指定type属性。然后把代码直接放在元素内部即可。
+

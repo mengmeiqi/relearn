@@ -1,0 +1,12 @@
+async
+
+async只适用于外部脚本文件，并告诉浏览器立即下载文件。
+
+标记为async的脚本并不保证按照指示指定他们的先后顺序执行(如果为多个)。
+
+<script type="text/javascript" async src="example1.js"></script>
+<script type="text/javascript" async src="example2.js"></script>
+
+异步脚本一定会在页面的load事件前执行 ，
+但可能会在DOMContentload 事件出发之前或之后执行。
+
