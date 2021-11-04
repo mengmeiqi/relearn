@@ -1,0 +1,368 @@
+let a = 6;
+let b = 9;
+function simpleTag(strings, aValExpression, bValExpression, sumExpression) {
+  console.log('strings', strings);
+  console.log('aValExpression ', aValExpression);
+  console.log('bValExpression ', bValExpression);
+  console.log('sumExpression ', sumExpression);
+  return 'foobar';
+}
+let untaggedResult = `${a}+${b}=${a+b}`;
+let taggedResult = simpleTag`${a}+${b}=${a+b}`;
+console.log('>>> 1 untaggedResult ', untaggedResult);
+console.log('>>> 2 taggedResult ', taggedResult);
+
+===== ===== ===== ===== ===== =====
+
+let a = 6;
+let b = 9;
+function zipTag(strings, ...expressions) {
+  let arr = expressions.map((e, i) => `${e}${strings[i+1]}`);
+  return strings[0] + expressions.map((e, i) => `${e}${strings[i+1]}`).join('');
+}
+let untaggedResult = `${a}+${b}=${a+b}`;
+let taggedResult = zipTag`${a}+${b}=${a+b}`;
+console.log(untaggedResult);
+console.log(taggedResult);
+
+===== ===== ===== ===== ===== =====
+
+console.log(`\u00A9`);
+console.log(String.raw`\u00A9`);
+
+console.log(`first line\nsecond line`);
+console.log(String.raw`first line\nsecond line`);
+console.log(`first line
+second line`);
+console.log(String.raw`first line
+second line`);
+
+===== ===== ===== ===== ===== =====
+function printRaw(strings) {
+  console.log('Actual characters:');
+  for(const string of strings) {
+    console.log(string);
+  }
+  console.log('Escaped characters;');
+  for(const rawString of strings.raw) {
+    console.log(rawString);
+  }
+}
+printRaw`\u00A9${'and'}\n`;
+
+symbol类型
+Symbol(符号)是ECMAScript6新增的数据类型。符号是原始值，且符号实例是唯一、不可变的。
+符号的用途是确保对象属性使用唯一标识符，不会发生属性冲突的危险。
+
+尽管听起来和私有属性有点相似，但符号并不是为了提供私有属性的行为才增加的
+(尤其是因为Object API提供了方法，可以更方便地发现符号属性)。
+相反，符号就是用来创建唯一记号，进而用作非字符串形式的对象属性。
+
+符号的基本用法
+符号需要使用Symbol()函数初始化。因为符号本身是原始类型，所以typeof操作符对符号返回symbol。
+let sym = Symbol();
+console.log(typeof sym);
+调用Symbol()函数时，也可以传入一个字符串参数作为对符号的描述(description)，
+将来可以通过这个字符串来调试代码。
+但是，这个字符串参数与符号定义或标识完全无关：
+
+let genericSymbol = Symbol();
+let otherGenericSymbol = Symbol();
+let fooSymbol = Symbol('foo');
+let otherFooSymbol  = Symbol('foo');
+console.log(genericSymbol == otherGenericSymbol);
+console.log(fooSymbol == otherFooSymbol);
+
+let mySymbol = Symbol();
+let myWrappedSymbol = Object(mySymol);
+console.log(typeof myWrappedSymbol);
+
+let mySymbol = Symbol();
+let myWrappedSymbol = Object(mySymbol);
+console.log(typeof myWrappedSymbol);
+
+使用全局符号注册表
+如果运行时的不同部分需要共享和重用符号实例，那么可以用一个字符串作为键，
+在全局符号注册表中创建并重用符号。
+为此，需要使用Symbol.for()方法
+
+let fooGlobalSymbol = Symbol.for('foo');
+console.log(typeof fooGlobalSymbol);
+
+Symbol.for()对每个字符串键都执行幂等操作。
+第一次使用某个字符串调用时，它会检查全局运行时注册表，发现不存在对应的符号，
+于是就会生成一个新符号实例并添加到注册表中。
+后续使用相同字符串的调用同样会检查注册表，发现存在与该字符串对应的符号，然后就会返回该符号实例。
+
+// 创建新符号
+let fooGlobalSymbol = Symbol.for('foo');
+// 重用已有符号
+let otherFooGlobalSymbol = Symbol.for('foo');
+console.log(fooGlobalSymbol === otherFooGlobalSymbol); // true
+
+即使采用相同的符号描述，在全局注册表中定义的符号跟使用Symbol()定义的符号也并不等同：
+
+let localSymbol = Symbol('foo');
+let globalSymbol = Symbol.for('foo');
+console.log(localSymbol === globalSymbol); // false
+
+全局注册表中的符号必须使用字符串来创建，因此作为参数传给Symbol.for()的任何值都会被转换为字符串。
+此外，注册表中使用的键同时也会被用作符号描述。
+
+let emptyGlobalSymbol = Symbol.for();
+console.log(emptyGlobalSymbol);
+
+还可以使用Symbol.keyFor()来查询全局注册表，这个方法接收符号，返回该全局符号对应的字符串键。
+如果查询的不是全局符号，泽返回undefined。
+
+// 创建全局符号
+let s = Symbol.for('foo');
+console.log(Symbol.keyFor(s));
+// 创建普通符号
+let s2 = Symbol('bar');
+console.log(Symbol.keyFor(s2)); // undefined
+
+如果传给Symbol.keyFor()的不是符号，则该方法抛出TypeError
+Symbol.keyFor(123)
+
+使用符号作为属性
+凡是可以使用字符串或数值作为属性的地方，都可以使用符号。
+这就包括了对象字面量属性和Object.defineProperty()/Object.defineProperties()定义的属性。
+对象字面量只能在计算属性语法中使用符号作为属性。
+
+let s1 = Symbol('foo');
+    s2 = Symbol('bar');
+    s3 = Symbol('baz');
+    s4 = Symbol('qux');
+let o = {
+  [s1]: 'foo val'
+};
+// 这样也可以：o[s1] = 'foo val';
+console.log(o);
+// {Symbol(foo): foo val}
+Object.defineProperty(o, s2, {value: 'bar val'});
+// {Symbol(foo): foo val, Symbol(bar): bar val}
+Object.defineProperties(o, {
+  [s3]: {value: 'baz val'},
+  [s4]: {value: 'qux val'}
+});
+console.log('>>> latest o', o);
+
+类似于 Object.getOwnPropertyNames()返回对象实例的常规属性数组，
+Object.getOwnProperty--Symbols()返回对象实例的符号属性数组。
+这两个方法的返回值彼此互斥。
+
+Object.getOwnProperty--Descriptions()会返回同时包含常规和符号属性描述符的对象。
+Reflect.ownKeys()会返回两种类型的键：
+
+let s1 = Symbol('foo');
+    s2 = Symbol('bar');
+let o = {
+  [s1]: 'foo val',
+  [s2]: 'bar val',
+  baz: 'baz val',
+  qux: 'qux val'
+}
+console.log(Object.getOwnPropertySymbols(o));
+// [Symbol(foo), Symbol(bar)]
+console.log(Object.getOwnPropertyNames(o));
+// ['baz', 'qux']
+console.log(Object.getOwnPropertyDescriptors(o));
+console.log(Reflect.ownKeys(o));
+
+因为符号属性是对内存中符号的一个引用，所以直接创建并用作属性的符号不会丢失。
+但是，如果没有显式地保存对这些属性的引用，那么必须遍历对象的所有符号属性才能找到相应的属性键。
+
+let o = {
+  [Symbol('foo')]: 'foo val',
+  [Symbol('bar')]: 'bar val',
+  baz: 'baz val',
+  qux: 'qux val'
+};
+console.log(o);
+let b = Object.getOwnPropertySymbols(o);
+console.log(b);
+let barSymbol = Object.getOwnPropertySymbols(o).find((symbol) => {
+  console.log('1', symbol);
+  symbol.toString().match(/bar/);
+});
+console.log(barSymbol);
+
+常用内置符号
+WCMAScript6也引入了一批常用内置符号(well-know symbol)，
+用于暴露语言内部行为，开发者可以直接访问、重写或模拟这些行为。
+这些内置符号都以Symbol工厂函数字符串属性的形式存在。
+
+这些内置符号最重要的用途之一是重新定义它们，从而改变原生结构的行为。
+比如，我们知道for-of循环会在相关对象上使用Symbol.iterator属性，
+那么就可以通过在自定义对象上重新定义Symbol.iterator的值，来改变for-of在迭代该对象时的行为。
+
+这些内置符号也没什么特别之处，它们就是全局函数Symbol的字符串属性，指向一个符号的实例。
+所有内置符号属性否是不可写、不可枚举、不可配置的。
+
+注意：在提到ECMAScript规范时，经常会引用符号在规范中的名称，前缀为@@。比如 @@iterator指的就是Symbol.iterator.
+
+Symbol.asyncIterator
+
+根据ECMAScript规范，这个符号作为一个属性表示“一个方法，该方法返回对象默认的AsyncIterator。由for-await-of语句使用。”
+换句话说，这个符号表示实现异步迭代器API的函数。
+
+for-await-of循环会利用这个函数执行异步迭代器。
+循环时，它们会调用以Symbol.asyncIterator为键的函数，并期望这个函数会返回一个实现迭代器API的对象。
+很多时候，返回的对象是实现该API的AsyncGenerator：
+
+class Foo {
+  async *[Symbol.asyncIterator]() {}
+}
+
+let f = new Foo();
+console.log(f[Symbol.asyncIterator]());
+// AsyncGenerator {<suspended>}
+
+技术上，这个由Symbol.asyncIterator函数生成的对象应该通过其 next()方法 陆续返回Promise实例。
+可以通过显式地调用next()方法返回，也可以隐式地通过异步生成器函数返回：
+
+class Bar {}
+class Baz extends Bar {
+  static[Symbol.hasInstance]() {
+    return false;
+  }
+}
+let b = new Baz();
+console.log(Bar[Symbol.hasInstance](b)); // true
+console.log(b instanceof Bar); // true
+console.log(Baz[Symbol.hasInstance](b)); // false
+console.log(b instanceof Baz); // false
+
+Symbol.isConcatSpreadable
+
+根据ECMAScript规范，这个符号作为一个属性表示“一个布尔值，
+如果是true，则意味着对象应该用Array.prototype.concat()”
+打平其数组元素。ES6中的Array.concat()方法会根据接收到的对象类型选择如何将一个类数组对象拼接成数组实例。
+覆盖Symbol.isConcat-Spreadable的值可以修改这个行为。
+
+数组对象默认情况下会被打平到已有的数组，false或假值会导致整个对象被追加到数组末尾。
+类数组对象默认情况下会被追加到数组末尾，true或真值会导致这个类数组对象被打平到数组实例。
+其他不是类数组对象的对象在Symbol.isConcatSpreadable被设置为true的情况下将被忽略。
+
+let initial = ['foo'];
+let array = ['bar'];
+console.log(array[Symbol.isConcatSpreadable]); // undefined
+console.log(initial.concat(array)); // ['foo', 'bar']
+console.log('1', initial);
+console.log('2', array);
+console.log('3', array[Symbol.isConcatSpreadable]); // undefined
+array[Symbol.isConcatSpreadable] = false;
+console.log(initial.concat(array)); // ['foo', Array(1)]
+let arrayLikeObject = {length: 1, 0: 'baz'};
+console.log(arrayLikeObject[Symbol.isConcatSpreadable]);
+console.log(initial.concat(arrayLikeObject));
+arrayLikeObject[Symbol.isConcatSpreadable] = true;
+console.log(initial.concat(arrayLikeObject)));
+
+根据ECMAScript规范，这个符号作为一个属性表示“一个方法，该方法返回对象默认的迭代器。由for-of语句使用。”
+换句话说，这个符号表示实现异步迭代器API的函数。
+for-of循环这样的语言结构会利用这个函数执行迭代操作。
+循环时，它们会调用以Symbol.iterator为键的函数，并默认这个函数会返回一个实现迭代器API的对象。
+很多时候，返回的对象是实现该API的Generator。
+
+ECMAScript中的等于操作符用两个等于号==表示，如果操作数相等，则会返回true。
+不等于操作符用叹号和等于号!=表示，如果两个操作数不想等，则会返回true。
+这两个操作符都会先进行类型转换(通常成为强制类型转换)再确定操作数是否相等。
+
+在转换操作数的类型时，相等和不相等操作符遵循如下规则。
+
+如果任一操作数是布尔值，则将其转换为数值再比较是否相等。false转换为0，true转换为1.
+如果一个操作数是字符串，另一个操作数是数值，则尝试将字符串转换为数值，再比较是否相等。
+如果一个操作数是对象，另一个操作数不是，则调用对象的valueOf()方法获得其原始值，再根据前面的规则进行比较。
+
+let i = 0;
+do {
+  i += 2;
+} while (i < 10)
+
+let i = 0;
+while(i < 10) {
+  i += 2;
+}
+
+for语句
+
+for语句也是先测试语句，只不过增加了进入循环之前的初始化代码。
+以及虚幻执行后要执行的表达式，语句如下
+for(initialization; expression; post-loop-expression) statement
+
+下面是一个用例
+let count = 10;
+for(let i = 0; i < count; i++) {
+  console.log(i);
+}
+
+以上代码在循环开始前定义了变量i的初始值为0.然后求值条件表达式，如果求值结果为true(i < count),
+则执行循环体。因此循环体也可能不会被执行。如果循环体被执行了，则循环后表达式也会执行，以便递增变量i。
+
+for循环跟下面的while循环是一样的：
+let count = 10;
+let i = 0;
+while (i < count) {
+  console.log(i);
+  i++;
+}
+
+无法通过while循环实现的逻辑，同样也无法使用for循环实现。因此for循环只是将循环相关的代码封装在了一起而已。
+
+在for循环的初始化代码中，其实是可以不使用变量声明关键字的。不过，初始化定义的迭代器变量在循环执行完成后
+几乎不可能再用到了。因此，最清晰的写法是使用let声明迭代器变量，这样就可以将这个变量的作用域限定在循环中。
+
+初始化、条件表达式和循环后表达式都不是必需的。因此，下面这种写法可以创建一个无穷循环：
+
+for(const propName in window) {
+  console.log(propName);
+}
+
+这个例子使用for-in循环显示了BOM对象window的所有属性。每次执行循环，都会给变量propName赋予
+一个window对象的属性作为值，直到window的所有属性都被枚举一遍。与for循环一样，这里控制语句中的const也不是必需的。
+但为了确保这个局部变量不被修改，推荐使用const。
+
+ECMAScript中对象的属性是无序的，因此for-in语句不能保证返回对象属性的顺序。
+换句话说 ，所有可枚举的属性都会返回一次，但返回的顺序可能会因浏览器而异。
+
+如果for-in循环要迭代的变量是null或undefined，则不执行循环体。
+
+for-of语句是一种严格的迭代语句，用于遍历可迭代对象的元素，语法如下：
+for(property of expression) statement
+下面是示例
+for(const el of [2, 4, 6, 8]) {
+  console.log(el);
+}
+
+在这个例子中，我们使用for-of语句显示了一个包含4哥元素的数组中的所有元素。
+循环会一直持续到将所有元素都迭代完。与for循环一样，这里控制语句中的const也不是必需的。
+但为了确保这个局部变量不被修改，推荐使用const。
+
+for-of循环会按照可迭代对象的next()方法产生值的顺序迭代元素。关于可迭代对象，本书将在第7章详细介绍。
+
+如果尝试迭代的变量不支持迭代，则for-of语句会抛出错误。
+
+注意ES2018对for-of语句进行了扩展，增加了for-await-of循环，一直吃生成期约(promise)的异步可迭代对象。
+相关内容将在附录A介绍。
+
+with语句
+with语句的用途是将代码作用域设置为特定的对象，其语法是：
+with(expression) statement;
+使用with语句的主要场景是针对一个对象反复操作，这时候将代码作用域设置为该对象能提供便利，如下面的例子所示：
+let qs = location.search.substring(1);
+let hostName = location.hostname;
+let url1 = location.href;
+console.log('1', qs);
+console.log('2', hostName);
+console.log('3', url1);
+
+with(location) {
+  let qs = search.substring(1);
+  let hostName = hostname;
+  let url1 = href;
+  console.log('1', qs);
+  console.log('2', hostName);
+  console.log('3', url1);
+}
