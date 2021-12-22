@@ -1,0 +1,181 @@
+1.防抖节流
+防抖：防抖是指在事件触发n秒后再执行回调，如果在n秒内再次被触发，则重新计算时间。
+主要应用场景有：
+a、scroll事件滚动触发，
+b、搜索框输入查询
+c、表单验证
+d、按钮提交事件
+e、浏览器窗口缩放，resize事件
+节流：节流是指如果持续触发某个事件，则每隔n秒执行一次。
+主要应用场景：
+a、DOM元素的拖拽功能实现
+b、射击游戏类
+c、计算鼠标移动的距离
+d、监听scroll事件
+
+2.qq号匹配(不是简单匹配)
+isQQ: function (str) {
+// 1 首位不能是0 ^[1-9]
+// 2 必须是 [5, 11] 位的数字 \d{4, 9}
+let reg = /^[1-9][0-9]{4,9}$/gim;
+if (reg.test(str)) {
+    console.log('QQ号码格式输入正确');
+    return true;
+} else {
+    console.log('请输入正确格式的QQ号码');
+    return false;
+}
+
+3.闭包(引出防抖节流编码)
+(1)闭包：
+其实就是作用域应用的特殊情况，有两种表现：函数作为参数被传递 函数作为返回值被返回
+理解为：外部函数中有个内部函数，内部函数引用外部函数中的局部变量，变量不释放
+自由变量的查找是在函数定义的地方，向上级作用于查找，而不是执行的地方
+
+(2)闭包的好处和应用
+希望一个变量长期保存在内存中
+避免污染 全局变量
+私有成员的存在（比如在没有class的时候，定义类要用function 传入属性 在类中定义方法使用属性）
+
+(3)应用：
+1、比如for循环延时打印  使用函数立即调用 占用变量不释放（但是现在有了let 有了块级作用域 其实解决了很多问题）
+2、通过闭包可以实现计时器的传参效果
+缺点：变量会常驻内存，得不到释放
+
+4.处理js阻断渲染问题
+什么是阻塞？
+在页面中我们通常会引用外部文件，而浏览器在解析HTML页面是从上到下依次解析、渲染，
+如果<head>中引用了一个a.js文件，而这个文件很大或者有问题，需要2秒加载，
+那么浏览器会停止渲染页面（此时是白屏显示，就是页面啥都没有），2秒后加载完成才会继续渲染，这个就是阻塞。
+为什么会阻塞？
+因为浏览器不知道a.js中执行了哪些脚本，会对页面造成什么影响，所以浏览器会等js文件下载并执行完成后才继续渲染，如果这个时间过长，会白屏。
+解决方式：
+推迟加载
+defer延迟加载
+异步加载
+
+5.浏览器渲染
+构建对象模型（DOM，CSSOM）
+构建渲染树（RenderTree）
+布局
+渲染
+
+6.原型 & 原型链
+原型  prototype 
+prototype  
+函数有一个prototype属性，这个属性是一个指针 指向他的原型对象
+原型对象下的属性和方法  可以被实例化对象所共享 
+原型下有一个constructor 属性指向他的构造函数
+__proto__,实例对象下的属性指向他的构造函数的原型
+原型链
+当从一个对象那里调取属性或方法时，如果该对象自身不存在这样的属性或方法，
+就会去自己关联的prototype对象那里寻找，如果prototype没有，
+就会去prototype关联的前辈prototype那里寻找，
+如果再没有则继续查找Prototype.Prototype引用的对象，依次类推，
+直到Prototype.….Prototype为undefined（Object的Prototype就是undefined）
+从而形成了所谓的原型链
+
+7.VUE
+(1)MVVM & MVC
+Model-View-ViewModel
+把MVC中的Controller演变成ViewModel
+Model层代表数据模型，View代表UI组件，
+ViewModel是View和Model层的桥梁，
+数据会绑定到viewModel层并自动将数据渲染到页面中，
+视图变化的时候会通知viewModel层更新数据
+
+(2)生命周期
+create、beforeCreate、created
+mount、beforeMount、mounted
+update、beforeUpdate、updated
+destroy、beforeDestroy、destroyed
+
+(3)computed与watch
+watch 属性监听 是一个对象，
+键是需要观察的属性，值是对应回调函数，
+主要用来监听某些特定数据的变化，
+从而进行某些具体的业务逻辑操作,监听属性的变化，
+需要在数据变化时执行异步或开销较大的操作时使用
+
+computed 计算属性
+属性的结果会被缓存，当computed中的函数所依赖的属性没有发生改变的时候，
+那么调用当前函数的时候结果会从缓存中读取。
+除非依赖的响应式属性变化时才会重新计算，主要当做属性来使用
+computed中的函数必须用return返回最终的结果
+computed更高效，优先使用
+
+(4)vue组件的通信方式
+a.父子组件通信
+父->子props，子->父 $on、$emit` 
+获取父子组件实例 parent、parent、parent、children Ref 
+获取实例的方式调用组件的属性或者方法 Provide、inject` 
+官方不推荐使用，但是写组件库时很常用
+b.兄弟组件通信
+Event Bus 实现跨组件通信 Vue.prototype.$bus = new Vue() Vuex
+c.跨级组件通信
+$attrs、$listeners
+Provide、inject
+
+(5)nextTick的实现
+nextTick是Vue提供的一个全局API,是在下次DOM更新循环结束之后执行延迟回调，
+在修改数据之后使用$nextTick，则可以在回调中获取更新后的DOM；
+Vue在更新DOM时是异步执行的。只要侦听到数据变化，Vue将开启1个队列，
+并缓冲在同一事件循环中发生的所有数据变更。
+如果同一个watcher被多次触发，只会被推入到队列中-次。
+这种在缓冲时去除重复数据对于避免不必要的计算和DOM操作是非常重要的。
+nextTick方法会在队列中加入一个回调函数，确保该函数在前面的dom操作完成后才调用；
+比如，我在干什么的时候就会使用nextTick，传一个回调函数进去，在里面执行dom操作即可；
+我也有简单了解nextTick实现，它会在callbacks里面加入我们传入的函数，
+然后用timerFunc异步方式调用它们，首选的异步方式会是Promise。
+这让我明白了为什么可以在nextTick中看到dom操作结果。
+
+(6)vnode的理解，compiler和patch的过程
+vnode 虚拟DOM节点 创建：
+export function Vnode (){
+    return {
+        tag:'div',
+        children: 'span',
+        attr:'',
+        text:'你好!'
+    }
+}
+
+(7)new Vue后整个的流程
+initProxy：作用域代理，拦截组件内访问其它组件的数据。
+initLifecycle：建立父子组件关系，在当前组件实例上添加一些属性和生命周期标识。如[Math Processing Error]parent,parent,refs,$children,_isMounted等。
+initEvents：对父组件传入的事件添加监听，事件是谁创建谁监听，子组件创建事件子组件监听
+initRender：声明[Math Processing Error]slots和slots和createElement()等。
+initInjections：注入数据，初始化inject，一般用于组件更深层次之间的通信。
+initState：重要）数据响应式：初始化状态。很多选项初始化的汇总：data,methods,props,computed和watch。
+initProvide：提供数据注入
+
+思考：为什么先注入再提供呢？？
+答：1、首先来自祖辈的数据要和当前实例的data,等判重，相结合，
+所以注入数据的initInjections一定要在InitState的上面。
+2. 从上面注入进来的东西在当前组件中转了一下又提供给后代了，所以注入数据也一定要在上面。
+vm.[Math Processing Error]mount(vm.mount(vm.options.el)：挂载实例。
+
+(8)keep-alive的实现
+作用：实现组件缓存
+钩子函数：
+`activated `组件渲染后调用
+`deactivated `组件销毁后调用
+复制代码
+原理：Vue.js内部将DOM节点抽象成了一个个的VNode节点，
+keep-alive组件的缓存也是基于VNode节点的而不是直接存储DOM结构。
+它将满足条件（pruneCache与pruneCache）的组件在cache对象中缓存起来，
+在需要重新渲染的时候再将vnode节点从cache对象中取出并渲染。
+配置属性：
+include 字符串或正则表达式。只有名称匹配的组件会被缓存
+exclude 字符串或正则表达式。任何名称匹配的组件都不会被缓存
+max 数字、最多可以缓存多少组件实例
+
+(9)vuex、vue-router实现原理
+vuex是一个专门为vue.js应用程序开发的状态管理库。
+核心概念：
+state(单一状态树) getter/Mutation显示提交更改state
+Action类似Mutation，提交Mutation，可以包含任意异步操作。
+module(当应用变得庞大复杂，拆分store为具体的module模块)
+
+(10)
+
