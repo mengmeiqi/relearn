@@ -1,0 +1,23 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-12-16 04:19:40
+ * @LastEditTime: 2021-12-16 04:32:33
+ * @LastEditors: Please set LastEditors
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: /relearn/js高级程序设计/14.html
+-->
+<html>
+  <body>
+    <div>
+      <img src="" alt="">
+    </div>
+    <script>
+      var str = "this is test string <img src=\"http:yourweb.com/test.jpg\" width='50' > 123 and the end <img src=\"所有地址也能匹配.jpg\" /> 33! <img src=\"/uploads/attached/image/20120426/20120426225658_92565.png\" alt=\"\" />";
+      var imgReg = /<img.*?(?:>|\/>)/gi;
+      var arr = str.match(imgReg);
+      console.error('arr', arr);
+
+      // <img.*?(?:>|\/>)
+    </script>
+  </body>
+</html>

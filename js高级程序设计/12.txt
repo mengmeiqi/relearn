@@ -1,0 +1,48 @@
+// 全局执行上下文
+GlobalExectionContext = {
+    
+    ThisBinding: <Global Object>,
+    // 词法环境
+    LexicalEnvironment: {
+    	EnvironmentRecord: {
+    		Type: "Object",
+    		// 标识符绑定，let、const、函数声明 
+    		a: <uninitialized>,
+    		b: <uninitialized>,
+    		multiply:< func >
+		}
+		outer: <null>
+	},
+    // 变量环境
+    VariableEnvironment: {
+        EnvironmentRecord: {
+            Type: "Object",
+            // 标识符绑定，var 声明
+            c: undefined,
+        }
+        outer: <null>
+    }
+}
+
+// 函数执行上下文
+FunctionExectionContext = {
+    ThisBinding: <Global Object>,
+    
+    LexicalEnvironment: {
+    	EnvironmentRecord: {
+    		Type: "Declarative",
+    		// 标识符绑定
+    		Arguments: { 0:20, 1:30, length: 2},
+		},
+        outer: <GlobalLexicalEnvironment>
+	},
+        
+    VariableEnvironment: {
+        EnvironmentRecord: {
+          Type: "Declarative",
+          // 在这里绑定标识符
+          g: undefined
+        },
+        outer: <GlobalLexicalEnvironment>
+  	}
+}

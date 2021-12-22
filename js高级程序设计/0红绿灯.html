@@ -1,0 +1,74 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-12-16 01:14:56
+ * @LastEditTime: 2021-12-16 04:18:24
+ * @LastEditors: Please set LastEditors
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: /relearn/js高级程序设计/13.html
+-->
+<!-- 实现红绿灯的功能 -->
+<html>
+<head></head>
+<style>
+  .box {
+    width: 500px;
+    height: 500px;
+    display: flex;
+  }
+
+  .light {
+    width: 100px;
+    height: 100px;
+    margin-right: 10px;
+    border: 1px solid #000;
+    border-radius: 50%;
+  }
+</style>
+<body>
+  <div>
+    <div class="box">
+      <div id="red" class="red light"></div>
+      <div id="yellow" class="yellow light"></div>
+      <div id="green" class="green light"></div>
+    </div>
+  </div>
+  <script>
+    // function switchLight() {
+    //   setTimeout(() => {
+    //     window.document.getElementById('red').style.backgroundColor = 'red';
+    //     window.document.getElementById('green').style.backgroundColor = 'white';
+    //   }, 1000);
+    //   setTimeout(() => {
+    //     window.document.getElementById('yellow').style.backgroundColor = 'yellow';
+    //     window.document.getElementById('red').style.backgroundColor = 'white';
+    //   }, 3000);
+    //   setTimeout(() => {
+    //     window.document.getElementById('green').style.backgroundColor = 'green';
+    //     window.document.getElementById('yellow').style.backgroundColor = 'white';
+    //   }, 6000);
+    // }
+    // setInterval(switchLight, 6000);
+    
+    function sleep(time) {
+      return new Promise((resolve, reject) => {
+        setTimeout(resolve, time);
+      })
+    }
+
+    async function run(){
+      window.document.getElementById('red').style.backgroundColor = 'red';
+      window.document.getElementById('green').style.backgroundColor = 'white';
+      await sleep(1000);
+      window.document.getElementById('yellow').style.backgroundColor = 'yellow';
+      window.document.getElementById('red').style.backgroundColor = 'white';
+      await sleep(2000);
+      window.document.getElementById('green').style.backgroundColor = 'green';
+      window.document.getElementById('yellow').style.backgroundColor = 'white';
+      await sleep(3000);
+    };
+
+    setInterval(run, 6000);
+
+  </script>
+</body>  
+</html>
